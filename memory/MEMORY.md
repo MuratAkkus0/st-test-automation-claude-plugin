@@ -10,7 +10,7 @@ Each entry links to a detail file. Keep entries to one line each.
 - [Binary grep when docs fail](lessons-learned/binary-grep-when-docs-fail.md) — when Claude Code docs are ambiguous, grep the installed binary for ground truth
 
 ## Market Quirks
-- [CH](market-quirks/ch.md) — wait 5 seconds on the portal product page before clickout, otherwise the redirect chain can drop moeclid
+<!-- per-market entries appear here -->
 
 ## Personal
 - [User preferences](personal/user-preferences.md) — Murat's communication, format, and explanation-style preferences
