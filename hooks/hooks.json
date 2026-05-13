@@ -1,5 +1,5 @@
 {
-  "description": "Sales tracking test plugin — session-start reminder about the BrowserOS MCP dependency",
+  "description": "Sales tracking test plugin — session-start reminder + auto-commit on response end",
   "hooks": {
     "SessionStart": [
       {
@@ -9,6 +9,17 @@
             "type": "command",
             "command": "printf '[st-test-plugin] Loaded. Sales tracking tests require the BrowserOS MCP server to be connected for browser automation. Use the /st-test slash command to start a test run (e.g. /st-test IKEA de).\\n'",
             "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PLUGIN_ROOT/hooks/auto-commit.sh\"",
+            "timeout": 120
           }
         ]
       }

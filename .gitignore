@@ -1,0 +1,11 @@
+# Auto-committer hook log output — never commit, prevents self-commit loops
+log/
+log/*.log
+
+# macOS noise
+.DS_Store
+
+# Editor temp files
+*.swp
+*.swo
+*~
