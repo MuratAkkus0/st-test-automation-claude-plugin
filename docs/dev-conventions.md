@@ -2,6 +2,8 @@
 
 These conventions apply when modifying the plugin itself (adding skills, agents, hooks, scripts, or refactoring structure). They were learned through real incidents during this plugin's development — see `memory/lessons-learned/` for the evidence behind each rule.
 
+**Enforcement:** these conventions are enforced in practice by the [`st-plugin-development`](../skills/st-plugin-development/SKILL.md) skill, which auto-invokes on any plugin development request and walks through a 9-phase workflow (pre-check → plan → subagent decision → anti-orphan/duplicate/workaround → implementation → validation → docs → commit → post-verify). This document is the WHAT (rules); the skill is the HOW (process).
+
 ## Plugin structure
 
 - **Flat layout for personal/local development.** The plugin lives at the repo root, not nested inside a `plugins/<name>/` subdirectory. Marketplace structure (`.claude-plugin/marketplace.json`) is only added when distributing to a team.

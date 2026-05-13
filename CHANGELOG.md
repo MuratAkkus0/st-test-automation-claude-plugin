@@ -4,6 +4,12 @@ All notable changes to this plugin are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this plugin uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `skills/st-plugin-development/SKILL.md` — canonical development workflow skill that codifies the methodology established across the plugin's first 7+ iterations. Auto-invoked for any plugin edit/patch/feature work. Enforces nine phases (pre-check → plan → subagent decision → anti-orphan/anti-duplicate/anti-workaround → implementation → validation → docs update → commit → post-verification). Hard guarantees: no workarounds, no orphan files, no duplicate features, no inline bash in `hooks.json`, no AI attribution in commits, root-cause fixes only.
+
 ## [1.7.0] — 2026-05-13
 
 Initial structured release. Converted from a standalone `.skill` archive into a full Claude Code plugin with skills, agents, commands, hooks, memory, and conventions.

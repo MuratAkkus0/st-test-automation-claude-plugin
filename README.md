@@ -19,7 +19,7 @@ Given a partner name and market code, the plugin runs a full test:
 claude --plugin-dir /path/to/st-test-plugin
 ```
 
-For permission setup (so the plugin doesn't ask for approval on every BrowserOS / Jira call), see [CLAUDE.md → Part 3: Required user setup](./CLAUDE.md).
+For permission setup (so the plugin doesn't ask for approval on every BrowserOS / Jira call), see [`docs/setup-guide.md`](./docs/setup-guide.md).
 
 ## Usage
 
@@ -54,7 +54,7 @@ Use when `/st-test` was run without a ticket ID and you want to post the existin
 
 ## Features
 
-- **8 modular skills** — orchestrator + market reference + 5 phase skills + report generation
+- **10 modular skills** — orchestrator + market reference + 5 phase skills + report generation + memory management (`st-memory`) + development workflow enforcer (`st-plugin-development`)
 - **5 specialist subagents** — cookie consent handler, partner finder, storage inspector, report writer, auto-committer
 - **3 slash commands** — `/st-test`, `/st-report`, `/st-jira-post`
 - **3 hooks** — session greet, memory injection (SessionStart) + auto-commit (Stop)
@@ -69,11 +69,14 @@ Use when `/st-test` was run without a ticket ID and you want to post the existin
 st-test-plugin/
 ├── .claude-plugin/plugin.json        plugin manifest
 ├── settings.json                     plugin-level permission defaults (forward-compat)
-├── CLAUDE.md                         memory rules + dev conventions + user setup
+├── CLAUDE.md                         plugin memory rules (Part 1)
+├── docs/
+│   ├── dev-conventions.md            development conventions (Part 2)
+│   └── setup-guide.md                required user permission setup (Part 3)
 ├── agents/                           5 specialist subagents
 ├── commands/                         3 slash commands
 ├── hooks/                            3 hooks + 3 shell scripts
-├── skills/                           8 skills (orchestrator + 7 detail skills)
+├── skills/                           10 skills (orchestrator + 7 phase + memory + dev-workflow)
 ├── memory/                           plugin-scoped memory (lessons, quirks, personal)
 ├── st-test-reports/                  generated test reports (auto-created per run)
 ├── log/                              hook logs (gitignored)
@@ -90,7 +93,8 @@ st-test-plugin/
 
 ## Development
 
-- See [CLAUDE.md](./CLAUDE.md) Part 2 for plugin development conventions (structure, hooks, subagents, testing, commits).
+- See [`docs/dev-conventions.md`](./docs/dev-conventions.md) for plugin development conventions (structure, hooks, subagents, testing, commits).
+- See [`skills/st-plugin-development/SKILL.md`](./skills/st-plugin-development/SKILL.md) for the development workflow that enforces those conventions.
 - See [CHANGELOG.md](./CHANGELOG.md) for version history.
 - See `memory/lessons-learned/` for evidence-backed lessons captured during development.
 
