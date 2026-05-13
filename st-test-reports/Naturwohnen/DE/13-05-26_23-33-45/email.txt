@@ -1,0 +1,22 @@
+Subject: Sales Tracking Integration Test — Naturwohnen (DE) — partial pass
+
+Hi team,
+
+We have run an end-to-end test of our Sales Tracking integration on your shop on 13 May 2026.
+
+The Base Tag part of the integration works correctly. After clicking through from moebel.de and accepting your cookie consent, our tracking ID (moeclid) is stored on your site as expected, so click attribution is in place.
+
+In this run we did not complete the order step, so the Conversion Tag side of the integration has not yet been verified. We will run a second test soon — placing a real test order on your shop — to confirm that the conversion call fires with the correct values on the order-confirmation page. No action is required from you at this stage; we will reach out again with the full result after that follow-up run.
+
+For reference, here are the relevant integration documentations:
+
+- Client-Side Tracking with Google Tag Manager: https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html
+- Manual Client-Side Integration: https://partner-integration.moebel.de/sales-tracking/1/manual-client-side-integration.html
+
+No test orders were placed on your shop in this run, so nothing needs to be cancelled.
+
+Please let us know if you have any questions in the meantime.
+
+Best regards,
+Murat
+moebel.de Partner Integrations Team
