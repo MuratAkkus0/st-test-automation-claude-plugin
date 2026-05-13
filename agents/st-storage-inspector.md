@@ -1,6 +1,6 @@
 ---
 name: st-storage-inspector
-description: Domain expert in verifying the moeclid tracking ID is stored on a partner site after cookie consent has been accepted (Base Part verification). Invoke this agent in Phase 2 after cookie consent is accepted and any newsletter popup is dismissed — it reads document.cookie for a `moeclid` cookie (Server-Side integration) and reads `localStorage.getItem('MOEBEL_CLICKOUT_ID')` (Client-Side integration), compares the stored value against the moeclid captured from the URL in Phase 1, and on empty storage reloads the page exactly once to distinguish "Base Tag trigger not set to page_view" from "Base Tag missing entirely". Never reloads BEFORE the first storage check — reloading before would mask a real integration bug.
+description: Domain expert in verifying the moeclid tracking ID is stored on a partner site after cookie consent has been accepted (Base Part verification). Invoke this agent in Phase 2 after cookie consent is accepted and any newsletter popup is dismissed — it reads document.cookie for a `moeclid` cookie (Server-Side integration) and reads `localStorage.getItem('MOEBEL_CLICKOUT_ID')` (Client-Side integration), compares the stored value against the moeclid captured from the URL in Phase 1, and on empty storage reloads the page exactly once to distinguish "Base Tag trigger not set to page_view" from "Base Tag missing entirely". Never reloads AFTER consent has been accepted but BEFORE the first storage check — reloading in that window would mask a real integration bug. This rule does NOT apply to the Phase 2 Step 2.0 pre-clean reload that runs before consent is even accepted, which is a separate first-visit-integrity step owned by the Phase 2 skill itself.
 tools: mcp__browseros__evaluate_script, mcp__browseros__navigate_page, mcp__browseros__take_snapshot
 model: sonnet
 ---
@@ -50,7 +50,9 @@ failure_cause: base_tag_trigger_not_set_to_page_view |
 notes: <human-readable summary suitable for the report>
 ```
 
-## Core algorithm — never reload before first check
+## Core algorithm — never reload AFTER consent but BEFORE the first storage check
+
+This agent is invoked only AFTER cookie consent has been accepted and any newsletter popup dismissed. The "no reload" rule applies strictly to the window between consent acceptance and the first storage read; a reload inside that window would falsify the test by letting the Base Tag fire on the reloaded `page_view` even when it would never fire for a real first-visit user. The pre-consent pre-clean reload that the Phase 2 skill performs at Step 2.0 (clear cookies + localStorage + sessionStorage, reload the same URL) is a separate concern owned by the skill, runs before this agent is invoked, and is explicitly outside the scope of this rule.
 
 ### Step 1 — read cookies on the current page (no reload)
 
@@ -102,7 +104,7 @@ Only run this step when `consent_action == "accepted"`. If there was no consent 
 
 ## Critical rules
 
-- **Never reload before the first check.** The whole point of the test is to verify the Base Tag fires on the natural first page load after consent acceptance. Reloading before reading storage masks a real bug by giving a false positive on the reloaded `page_view`.
+- **Never reload AFTER consent has been accepted but BEFORE the first storage check.** The whole point of the test is to verify the Base Tag fires on the natural first page load after consent acceptance. Reloading inside this post-consent / pre-storage-check window masks a real bug by giving a false positive on the reloaded `page_view`. This rule is scoped strictly to the post-consent window — the Phase 2 Step 2.0 pre-clean reload that runs before consent is even accepted is an independent first-visit-integrity step (it discards stale state from previous test runs on the same partner) and is explicitly NOT covered by this rule.
 - **Storage key names are exact:** the cookie name is literally `moeclid` and the localStorage key is literally `MOEBEL_CLICKOUT_ID` (with the `clickId` field nested as JSON inside the value). Do not normalise capitalisation or accept variants.
 - **Compare stored values to `moeclid_value`** — a stored value that does not match the URL parameter is a different bug (stale leftover or attribution bug) and must be flagged in `notes`.
 - **Only reload ONCE.** A second reload masks real bugs and adds nothing diagnostic.

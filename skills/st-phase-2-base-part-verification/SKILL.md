@@ -7,19 +7,62 @@ compatibility: claude-code
 # Phase 2: Partner Page Inspection & Base Part Verification
 
 **The order of steps in this phase is mandatory and must never be skipped or reordered:**
-1. Snapshot the page immediately after redirect (see what is shown)
-2. Accept cookie consent
-3. Handle email/newsletter popups
-4. Check storage (cookies + localStorage) — **without reloading the page**
+1. **Pre-clean the partner domain** (clear cookies + localStorage + sessionStorage, then reload the same URL) — guarantees a true first-visit state before any other action
+2. Snapshot the page immediately after the pre-clean reload (see what is shown)
+3. Accept cookie consent
+4. Handle email/newsletter popups
+5. Check storage (cookies + localStorage) — **without reloading the page after consent**
 
 This order matters because Base Part scripts on many partners only fire after the user makes a consent decision. Checking storage before accepting consent is the single most common cause of false-negative results.
 
-**Critical: never reload the page before checking storage.**
-A correct integration fires the tracking script via the CMP's consent callback (e.g., `CookiebotOnAccept`, `UCEvent`, `OneTrustGroupsUpdated`) — meaning the moeclid is stored on the same page load, immediately after the user accepts consent, without any navigation or reload. If storage is still empty after consent is accepted on the same page, that is a broken integration, not a timing issue. A page reload would mask this bug by giving a false positive — the script fires on the reloaded page's `page_view` even though it would never fire for a real user who lands fresh and accepts consent.
+**Critical: never reload the page AFTER consent has been accepted but BEFORE checking storage.**
+This rule applies only to the post-consent window — between Step 2.4 (accept consent) and Step 2.6/2.7 (storage check). It does NOT apply to the pre-consent pre-clean reload in Step 2.0, which happens before any snapshot, before any consent acceptance, and before any storage read — the pre-clean reload's purpose is to discard stale state from a previous test run on the same partner, not to mask a tracking bug.
+
+A correct integration fires the tracking script via the CMP's consent callback (e.g., `CookiebotOnAccept`, `UCEvent`, `OneTrustGroupsUpdated`) — meaning the moeclid is stored on the same page load, immediately after the user accepts consent, without any navigation or reload. If storage is still empty after consent is accepted on the same page, that is a broken integration, not a timing issue. A post-consent reload would mask this bug by giving a false positive — the script fires on the reloaded page's `page_view` even though it would never fire for a real user who lands fresh and accepts consent. The only legitimate post-consent reload is the diagnostic one in Step 2.7 used to distinguish "trigger not set to page_view" from "tag missing entirely".
 
 ---
 
-**Step 2.0: Snapshot the partner page immediately after redirect**
+**Step 2.0: Pre-clean the partner domain (cookies + localStorage + sessionStorage) and reload**
+
+This step is mandatory and must run BEFORE the snapshot, BEFORE accepting consent, BEFORE any storage read. Phase 0 already clears the portal domain, but Phase 0 doesn't know the partner domain yet — Phase 2 is the first point in the test where the partner domain is known, so it's the right place to clear partner-domain state. Without this step, stored CookieConsent / `MOEBEL_CLICKOUT_ID` / `moeclid` cookies left over from a previous test run on the same partner would silently mask first-visit-after-consent behaviour: a leftover moeclid looks like "stored on the first page load" today when it actually came from yesterday.
+
+After clearing storage, reload the same URL. The reload preserves the URL — `moeclid=...` is still in the query string — so the Base Tag, when it fires, can still capture the click id. This pre-clean reload happens BEFORE consent, which is why it does not conflict with the post-consent "never reload before storage check" rule (see the critical-rule paragraph above).
+
+```python
+# 2.0a — Clear cookies + localStorage + sessionStorage on the partner domain.
+# Mirrors the Phase 0 clear loop verbatim so the behaviour is consistent across phases.
+evaluate_script(page=newPageId, expression="""
+(function() {
+  // Clear cookies on this domain (best-effort — HttpOnly cookies cannot be removed via JS,
+  // but session/CMP cookies that drive consent state always can)
+  document.cookie.split(';').forEach(c => {
+    const eq = c.indexOf('=');
+    const name = eq > -1 ? c.substr(0, eq).trim() : c.trim();
+    const host = window.location.hostname;
+    ['/', '/' + host, host, '.' + host].forEach(d => {
+      document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=' + d;
+    });
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+  });
+  localStorage.clear();
+  sessionStorage.clear();
+})()
+""")
+
+# 2.0b — Reload the same URL. The moeclid query param is preserved across the reload,
+# so the page comes up as a guaranteed first-visit on a clean partner domain.
+navigate_page(page=newPageId, action="reload")
+
+report["phase2"]["pre_clean"] = {
+    "cleared": True,
+    "reloaded": True,
+    "notes": "Partner-domain cookies/localStorage/sessionStorage cleared and page reloaded BEFORE consent acceptance to guarantee first-visit integrity."
+}
+```
+
+---
+
+**Step 2.1: Snapshot the partner page immediately after the pre-clean reload**
 
 This step is mandatory. Take it before clicking anything. It documents the exact initial state of the page and reveals what overlays, popups, or consent walls are present.
 
@@ -47,7 +90,7 @@ report["phase2"]["initial_page_state"] = {
 
 ---
 
-**Step 2.1: Accept cookie consent (BEFORE checking storage)**
+**Step 2.2: Accept cookie consent (BEFORE checking storage)**
 
 Cookie consent must always be handled before checking storage. Many partners gate their Base Part script behind consent callbacks — the script simply does not run until the user accepts consent. Skipping this step produces a guaranteed false negative.
 
@@ -86,7 +129,7 @@ For the layered detection strategy (a11y snapshot → TreeWalker → retry) — 
 
 ---
 
-**Step 2.2: Handle email/newsletter subscription popups (after consent)**
+**Step 2.3: Handle email/newsletter subscription popups (after consent)**
 
 After accepting consent, some partners immediately display a newsletter or email subscription modal. Always check for this and dismiss it before reading storage. Leaving it open clutters screenshots and can occasionally interfere with DOM queries.
 
@@ -115,7 +158,7 @@ else:
 
 ---
 
-**Step 2.3: Take a post-popup screenshot**
+**Step 2.4: Take a post-popup screenshot**
 
 Now that all overlays are cleared, take a screenshot of the clean product page. This shows the state in which the Base Part should have run and is useful for the report.
 
@@ -126,7 +169,7 @@ take_screenshot(page=newPageId)
 
 ---
 
-**Step 2.4: Check cookies (Server-Side Integration)**
+**Step 2.5: Check cookies (Server-Side Integration)**
 
 ```python
 result = evaluate_script(page=newPageId, expression="""
@@ -153,7 +196,7 @@ report["phase2"]["cookies"] = {
 
 ---
 
-**Step 2.5: Check localStorage (Client-Side Integration)**
+**Step 2.6: Check localStorage (Client-Side Integration)**
 
 ```python
 result = evaluate_script(page=newPageId, expression="""
@@ -180,7 +223,7 @@ report["phase2"]["localStorage"] = {
 
 ---
 
-**Step 2.6: Base Part Result**
+**Step 2.7: Base Part Result**
 
 ```python
 base_part_working = (
@@ -218,12 +261,15 @@ else:
     # If there was no consent banner, skip straight to the generic failure.
 
     if consent_action == "accepted":
-        # Step 2.6a: Reload the page to let the script fire on a fresh page_view
-        # with consent already active
+        # Step 2.7a: Reload the page to let the script fire on a fresh page_view
+        # with consent already active. NOTE: this is the diagnostic post-consent
+        # reload — it is allowed precisely because storage was already checked
+        # (and empty) on the same page load immediately after consent. It is
+        # distinct from the Step 2.0 pre-clean reload, which runs before consent.
         navigate_page(page=newPageId, action="reload")
         take_snapshot(page=newPageId)  # always retake snapshot after reload
 
-        # Step 2.6b: Re-check storage after reload (same script as Steps 2.4–2.5)
+        # Step 2.7b: Re-check storage after reload (same script as Steps 2.5–2.6)
         post_reload_storage = evaluate_script(page=newPageId, expression="""
         (function() {
           const allCookies = document.cookie.split(';').map(c => {

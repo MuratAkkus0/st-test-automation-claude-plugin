@@ -113,7 +113,7 @@ Each phase has its own focused skill containing the full technical details (sele
 
 2. **`st-phase-1-navigation-and-moeclid-capture`** — find the partner via the shops/boutiques listing, fall back to the marken/marques (brands) listing on miss, click the cheapest product, follow the redirect chain, verify `moeclid=` is present in the final URL. 🛑 STOP on partner-not-listed-anywhere or moeclid-missing.
 
-3. **`st-phase-2-base-part-verification`** — snapshot the partner page, accept partner cookie consent, dismiss newsletter popups, check cookies and localStorage WITHOUT reloading. On empty storage with consent accepted, reload once to distinguish "trigger not page_view" from "tag missing entirely". 🛑 STOP on FAILED Base Part.
+3. **`st-phase-2-base-part-verification`** — pre-clean the partner domain (clear cookies/localStorage/sessionStorage and reload the same URL with the `moeclid` query param still attached) to guarantee first-visit integrity, then snapshot the partner page, accept partner cookie consent, dismiss newsletter popups, check cookies and localStorage WITHOUT reloading after consent. On empty storage with consent accepted, reload once (the diagnostic post-consent reload) to distinguish "trigger not page_view" from "tag missing entirely". 🛑 STOP on FAILED Base Part.
 
 4. **`st-phase-3-purchase-flow`** — add to cart, handle guest-vs-login (mandatory login procedure when email is already registered), fill shipping (locale-aware postal codes), retry with fallback address on carrier rejection, select payment (Vorkasse > Bank Transfer > Credit Card), submit order, capture order number from the visible confirmation page (URL `id_order` only as a flagged fallback).
 
@@ -128,7 +128,7 @@ The `st-market-reference` skill is the canonical source of truth for per-market 
 ## Important Notes (apply across all phases)
 
 1. **Always use BrowserOS MCP** (`mcp__browserOS__*`) — never Claude in Chrome or any other browser tool
-2. **Phase 2 order is mandatory**: snapshot → accept consent → email popup → storage check (same page, no reload). If storage is empty after consent was accepted, then reload and re-check before reporting. Never skip or reorder these steps.
+2. **Phase 2 order is mandatory**: pre-clean partner domain (clear cookies/localStorage/sessionStorage + reload same URL with `moeclid` still in the query) → snapshot → accept consent → email popup → storage check (same page, no reload after consent). If storage is empty after consent was accepted, then reload and re-check before reporting. The pre-clean reload at the very start is BEFORE consent and is independent of the "never reload after consent" rule — it exists to discard stale state from previous test runs on the same partner so the storage check has unambiguous semantics. Never skip or reorder these steps.
 3. **Cookie consent is nearly always present** — treat it as the standard, not an exception
 4. **Always ACCEPT cookie consent** — never decline. Declining may prevent tracking scripts from running, which defeats the purpose of the test.
 5. **Email popups appear after consent** — always take a fresh snapshot after accepting consent to catch them
