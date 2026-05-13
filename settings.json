@@ -4,10 +4,16 @@
       "mcp__browseros__*",
       "mcp__claude_ai_Atlassian__*",
       "Read(./**)",
+      "Read(**/st-test-plugin/**)",
       "Write(./st-test-reports/**)",
+      "Write(**/st-test-reports/**)",
       "Write(./memory/**)",
+      "Write(**/memory/**)",
       "Edit(./memory/**)",
+      "Edit(**/memory/**)",
       "Bash(mkdir -p ./st-test-reports/**)",
+      "Bash(mkdir -p **/st-test-reports/**)",
+      "Bash(date *)",
       "Bash(python3 *)"
     ]
   }

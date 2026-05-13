@@ -1,0 +1,21 @@
+Subject: Sales Tracking Integration Test — Naturwohnen (DE) — Base Part verified, Conversion Tag not yet tested
+
+Hi team,
+
+We have run a partial end-to-end test of our Sales Tracking integration on your shop on 14 May 2026.
+
+The Base Tag part of the integration works correctly. After accepting your cookie consent, the click ID we send in the URL is stored immediately in localStorage (under MOEBEL_CLICKOUT_ID) on the first page load, with no reload required. This is exactly the expected behaviour for a client-side integration with a Page View — All Pages trigger.
+
+We did not place an order in this run, so the Conversion Tag (the part that reports a completed sale back to us at the order confirmation step) has not been verified yet. We will schedule a follow-up test with a real test order to confirm the Conversion Tag fires with the correct payload and PARTNER_KEY.
+
+For reference, here are the relevant integration documentations:
+- Client-Side Tracking with Google Tag Manager — https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html
+- Manual Client-Side Integration — https://partner-integration.moebel.de/sales-tracking/1/manual-client-side-integration.html
+
+No test orders were placed in this run, so there is nothing to cancel on your side.
+
+Please let us know once we can schedule the follow-up Conversion Tag test.
+
+Best regards,
+Murat
+moebel.de Partner Integrations Team
