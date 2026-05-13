@@ -1,0 +1,18 @@
+Subject: Sales Tracking Test — Naturwohnen (moebel.de DE)
+
+Hi Naturwohnen team,
+
+I ran a sales tracking test today on your moebel.de DE integration to verify the Base Part of the tracking flow.
+
+Result: the Base Part is working. The `moeclid` parameter passed through the moebel.de redirect was correctly captured by your tag and stored in `localStorage` under `MOEBEL_CLICKOUT_ID` on the first product page load, with an accurate same-load timestamp and a matching `clickId`. Integration type is client-side (localStorage). No console errors were observed on the product page.
+
+We did not run a test purchase in this round, so the Conversion Part (the `/api/1.0/moebel/de/sales` call on the order-confirmation page) was not verified today. We'll cover that in a follow-up end-to-end run. No test orders were placed, so nothing on your side needs to be cancelled.
+
+Reference documentation if useful for your team:
+- https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html
+- https://partner-integration.moebel.de/sales-tracking/1/manual-client-side-integration.html
+
+Happy to chat if you have any questions.
+
+Best regards,
+Murat
