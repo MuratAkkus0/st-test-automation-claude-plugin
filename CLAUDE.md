@@ -4,7 +4,19 @@ This file is auto-loaded when the plugin is active. It contains two sets of rule
 
 # Part 1: Memory System
 
-This plugin has its own memory system at `memory/`. Read and write plugin memory there, not in the global `~/.claude/projects/*` location, when the topic is plugin or ST-domain related.
+This plugin has its own memory system at `memory/`. Two memory systems coexist when this plugin is active: Claude Code's built-in auto-memory (writes to `~/.claude/projects/*`) and this plugin's memory (writes to `memory/`). They have different scopes — route correctly.
+
+## Routing rule (overrides built-in auto-memory defaults)
+
+When the user says "remember", "hatırla", expresses a preference, or you detect something memory-worthy, decide where it belongs BEFORE writing:
+
+- **Use plugin memory (`memory/` here)** for any of the following — these override Claude Code's built-in auto-memory:
+  - ST-test process insights, partner/market debugging patterns, integration quirks
+  - Plugin development conventions, hook patterns, subagent design lessons
+  - **Any user preference**, regardless of topic — communication style, output format, naming ("call me X"), workflow, language. ALL user preferences go to plugin memory when this plugin is active.
+- **Use built-in auto-memory (`~/.claude/projects/*`)** for unrelated topics that surface in this session — generic coding tips, other projects, anything outside the ST-test domain AND not a user preference.
+
+When in doubt about user preferences, default to plugin memory. The built-in system is for everything else.
 
 ## Memory location
 

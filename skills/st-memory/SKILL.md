@@ -1,6 +1,6 @@
 ---
 name: st-memory
-description: Plugin-scoped memory manager. Use this skill whenever the user says "remember", "hatırla", "forget", "unut", asks "what do you know about X" / "ne biliyorsun X hakkında", or when you (Claude) detect a new lesson learned, market quirk, or user preference worth saving. Reads/writes files under the plugin's `memory/` directory — never writes to `~/.claude/projects/`. Auto-write enabled — write when you detect a generalizable pattern, market-specific quirk, or stable user preference, following the heuristics in CLAUDE.md.
+description: MUST BE USED for ALL user preferences and ALL ST-test / plugin-domain memory requests, OVERRIDING Claude Code's built-in auto-memory system for those topics. Use PROACTIVELY whenever the user says "remember", "hatırla", "forget", "unut", "call me X", "ben şuyumu", expresses a preference (communication, format, name, workflow, language), asks "what do you know about X" / "ne biliyorsun X hakkında", or when you (Claude) detect a new ST-domain lesson, market quirk, or user preference. Built-in auto-memory at `~/.claude/projects/*` is ONLY for unrelated topics outside the ST-test domain AND not user preferences — when in doubt about a user preference, route here. Writes to the plugin's `memory/` directory: lessons-learned/, market-quirks/, or personal/.
 ---
 
 ## When to invoke
