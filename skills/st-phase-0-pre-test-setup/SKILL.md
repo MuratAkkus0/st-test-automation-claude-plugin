@@ -29,19 +29,38 @@ Create a dictionary/object to store all test results as you progress through pha
 - Use `mcp__browserOS__new_page` to open a fresh tab for each test
 - Note: Tests should be run from Office WiFi/VPN for proper "internal traffic" invalidation
 
-**6. Clear browser state for both the portal and the partner domain (mandatory)**
+**6. Clear browser state for both the portal and the partner domain (mandatory) — with anchor-tab protection**
 
 Stale `CookieConsent` cookies and `MOEBEL_CLICKOUT_ID` localStorage entries from a previous test run will silently mask real first-visit behaviour in Phase 2 — the moeclid will appear to be stored "on first page load" when in fact it's a leftover from yesterday. Always clear browser state before starting.
 
+**⚠️ Anchor-tab rule (verified 2026-05-13, Naturwohnen DE run):** BrowserOS tears its profile down when the total tab count drops to 0. Once that happens, every subsequent `mcp__browseros__new_page` call fails with `"No browser window available"`, and `mcp__browseros__create_window` fails with `"No profile available"` — both unrecoverable from the skill side, the user has to relaunch BrowserOS manually. Phase 0 cleanup is the exact path that triggers this: when starting a new run with N pre-existing tabs from a previous session, closing all N tabs (or running the per-domain clear loop until it drops to 0) kills the profile. **Phase 0 must keep at least one tab open at all times.** Open an `about:blank` anchor BEFORE closing any pre-existing tabs and BEFORE the per-domain clear-state loop. The anchor is only closed after the real portal tab is open for step 7.
+
 ```python
+# 0) Open the anchor FIRST. about:blank is harmless, fully empty, and keeps
+#    the BrowserOS profile alive while we close pre-existing tabs and run the
+#    per-domain clear-state loop. Without this, closing the last pre-existing
+#    tab drops total page count to 0 → profile torn down → all subsequent
+#    new_page / create_window calls fail unrecoverable.
+anchor = new_page(url="about:blank", background=False)
+anchor_id = anchor["pageId"]  # save so we don't accidentally close the anchor in the loop below
+
 # 1) Clear global browser history (covers all domains, recent and historical)
 delete_history_range(startTime=0, endTime=99999999999999)
 
-# 2) For each domain we'll touch (portal + partner's main domain when known),
-#    open it once, clear cookies and storage, then close the tab.
+# 2) Close any pre-existing tabs left over from a previous run. The anchor is
+#    now the last tab so total count never drops to 0.
+for p in list_pages()["pages"]:
+    if p["pageId"] != anchor_id:
+        close_page(page=p["pageId"])
+
+# 3) Per-domain clear loop. Each iteration opens a temp tab, clears cookies +
+#    localStorage + sessionStorage, then closes the temp tab. Anchor remains
+#    open throughout, so each close_page is safe.
 for domain in [PORTAL_URLS[market_code], partner_domain_if_known]:
+    if domain is None:
+        continue  # partner domain may be unknown at Phase 0
     page = new_page(url=domain, background=False)
-    evaluate_script(page=page, expression="""
+    evaluate_script(page=page["pageId"], expression="""
     (function() {
       // Clear cookies on this domain (best-effort — HttpOnly cookies cannot be removed via JS,
       // but session/CMP cookies that drive consent state always can)
@@ -58,10 +77,20 @@ for domain in [PORTAL_URLS[market_code], partner_domain_if_known]:
       sessionStorage.clear();
     })()
     """)
-    close_page(page=page)
+    close_page(page=page["pageId"])
+
+# 4) Open the real portal page — this is the tab step 7 will run consent
+#    acceptance on, and that Phase 1 will navigate from. Order matters:
+#    open the portal tab BEFORE closing the anchor so the total tab count
+#    stays ≥1 the whole time.
+portal = new_page(url=PORTAL_URLS[market_code], background=False)
+portal_page_id = portal["pageId"]
+close_page(page=anchor_id)
 ```
 
-The partner's main domain is usually not known yet at Phase 0 (it's only revealed after the moebel.de redirect chain in Phase 1), so for now clear at least the portal domain. Once Phase 1 has resolved the partner domain, repeat the clear on that domain too if any state was set during the redirect (CookieConsent, etc.) — this is the second clear, before the consent acceptance and storage check in Phase 2.
+**The single rule:** **never let total tab count reach 0 during Phase 0.** When in doubt, open a temporary `about:blank` tab and only close it after a real working tab is in place. The cost of an extra tab is nothing; the cost of profile teardown is "stop the run and tell the user to relaunch BrowserOS".
+
+The partner's main domain is usually not known yet at Phase 0 (it's only revealed after the moebel.de redirect chain in Phase 1), so for now clear at least the portal domain. Once Phase 1 has resolved the partner domain, repeat the clear on that domain too if any state was set during the redirect (CookieConsent, etc.) — this is the second clear, before the consent acceptance and storage check in Phase 2. The anchor-tab rule applies to that second clear too: keep the portal/partner tab open as the implicit anchor while running the temp-tab clear loop on the new domain.
 
 **7. Accept the portal's own cookie consent BEFORE clicking any partner redirect (mandatory)**
 
@@ -77,8 +106,11 @@ Use the `ACCEPT_KEYWORDS` table from the `st-market-reference` skill.
 ```python
 import time
 
-# Open the portal landing page (already opened during the clear-state step above)
-portal_page = new_page(url=PORTAL_URLS[market_code], background=False)
+# Reuse the portal tab opened at the end of step 6 (`portal_page_id`). Do NOT
+# call `new_page` again — opening a second portal tab would create a duplicate
+# with un-cleared state and the consent click below would happen on the wrong
+# tab. Step 6 already left a single open portal tab for this step to use.
+portal_page = portal_page_id
 
 # Give React/Next.js ~1.5s to hydrate so the custom CMP has time to mount.
 # The moebel.de family CMP is not in the DOM at first paint; without this wait
