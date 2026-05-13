@@ -9,3 +9,6 @@ log/*.log
 *.swp
 *.swo
 *~
+
+# Personal memory entries — local only, not for team sharing
+memory/personal/
