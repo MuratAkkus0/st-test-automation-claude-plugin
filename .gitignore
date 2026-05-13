@@ -12,3 +12,5 @@ log/*.log
 
 # Personal memory entries — local only, not for team sharing
 memory/personal/
+
+out_of_scope
