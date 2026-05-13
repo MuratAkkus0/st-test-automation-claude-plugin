@@ -1,0 +1,22 @@
+Subject: Sales Tracking Integration Test — Naturwohnen (DE) — Base Tag verified, Conversion Tag still to test
+
+Hi team,
+
+We have run a partial end-to-end test of our Sales Tracking integration on your shop on 13 May 2026.
+
+The Base Tag part of the integration is working correctly. After a user lands on your shop from moebel.de, the moeclid parameter is reliably stored in localStorage under MOEBEL_CLICKOUT_ID, which is what we need on every page load. No action is required on your side for this part.
+
+We did not place a real order on this run, so we have not yet verified the Conversion Tag. We will schedule a second run shortly that goes all the way through to order confirmation, which will let us validate the conversion request and the PARTNER_KEY on our side.
+
+For reference, here are the relevant integration documentations in case you want to double-check the Conversion Tag setup ahead of our next run:
+
+- Client-Side Tracking with Google Tag Manager: https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html
+- Manual Client-Side Integration: https://partner-integration.moebel.de/sales-tracking/1/manual-client-side-integration.html
+
+No test orders were placed on this run, so there is nothing to cancel on your side.
+
+We will be in touch once the Conversion Tag has been verified.
+
+Best regards,
+Murat
+moebel.de Partner Integrations Team

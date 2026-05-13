@@ -1,0 +1,17 @@
+{
+  "description": "Sales tracking test plugin — session-start reminder about the BrowserOS MCP dependency",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '[st-test-plugin] Loaded. Sales tracking tests require the BrowserOS MCP server to be connected for browser automation. Use the /st-test slash command to start a test run (e.g. /st-test IKEA de).\\n'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

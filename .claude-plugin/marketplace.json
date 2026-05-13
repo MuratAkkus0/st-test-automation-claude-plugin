@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "st-local",
+  "description": "Local marketplace for sales-tracking test plugin development",
+  "owner": {
+    "name": "Murat Akkus",
+    "email": "murat.akkus@moebel.de"
+  },
+  "plugins": [
+    {
+      "name": "st-test-plugin",
+      "description": "Automates end-to-end sales tracking tests for furniture e-commerce partners.",
+      "author": {
+        "name": "Murat Akkus",
+        "email": "murat.akkus@moebel.de"
+      },
+      "source": "./plugins/st-test-plugin",
+      "category": "qa"
+    }
+  ]
+}

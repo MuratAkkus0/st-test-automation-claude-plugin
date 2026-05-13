@@ -1,0 +1,9 @@
+{
+  "name": "st-test-plugin",
+  "description": "Automates end-to-end sales tracking (ST) tests for furniture e-commerce partners. Verifies moeclid tracking, Base Part, and Conversion Part across moebel.de family markets.",
+  "version": "1.7.0",
+  "author": {
+    "name": "Murat Akkus",
+    "email": "murat.akkus@moebel.de"
+  }
+}
