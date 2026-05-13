@@ -89,9 +89,12 @@ if listing_source == "brands":
 navigate_page(page=pageId, url=f"{partner_url}?ps=asc")
 ```
 
-**Step 1.2: Find the cheapest product redirect URL**
+**Step 1.2: Find the cheapest product redirect link**
 ```python
-# Extract the first product's moebel.de redirect href from the DOM
+# Confirm the first product's moebel.de redirect href exists in the DOM. The href is
+# read for sanity-checking and logging only — never used as a URL to navigate to
+# directly. Step 1.3 always opens the partner page by CLICKING the link in the live
+# DOM, not by navigating to the href.
 evaluate_script(page=pageId, expression="""
 (function() {
   const links = Array.from(document.querySelectorAll('a'));
@@ -110,18 +113,63 @@ report["phase1"]["product_selection"] = {
 - Generate report immediately
 - Mark test as FAILED — "No product redirect URL found on partner page"
 
-**Step 1.3: Open the redirect URL in a new tab**
+**Step 1.3: Open the partner page by CLICKING the product link (never by `new_page(url=redirect_href)`)**
 
-Important: Phase 0 must already have accepted the portal's own cookie consent in the same browser session before this step runs. Without portal consent, the redirect chain on some markets strips `partnerId`/`partnerName` mid-chain and lands on a 404 on the portal's own domain (verified on Schlafenwelt DE on 2026-04-27, where the redirect went to `/api/product/redirectWithCheck?...` with no partner context after the strip). If you're seeing a portal-domain 404 here, the cause is almost always a missed Phase 0 consent step — go back, run Phase 0 step 7 to accept the portal CMP, then retry this step. Do not abort the test on the 404 without first checking that.
+**Mandatory rule: always click the link in the live DOM. Never call `new_page(url=...)` against the redirect href.** Opening the redirect href directly bypasses the same-page context (Referer header, the click-handler that fires a tracking event before the navigation, the listing-page's session-level state) that the portal's `/redirect?...` endpoint depends on to resolve `partnerId`/`partnerName`. Without that context, the portal's redirect endpoint strips the partner params mid-chain and lands on `/api/product/redirectWithCheck?...` → a portal-internal 404. Verified 2026-05-13 on Naturwohnen DE: the first product 404'd via `new_page(url=redirect_href)`; clicking the same link on the same partner page opened the partner site with `moeclid` intact. The fix is "always click the link element"; there is no fallback to direct navigation.
+
+Phase 0 must also already have accepted the portal's own cookie consent in the same browser session before this step runs — that's a separate prerequisite, not a substitute for the click rule. Both are required.
 
 ```python
-# Opening the redirect URL in a new page triggers the full redirect chain
-# and lands on the partner website with moeclid appended to the URL
-new_page(url=redirect_href, background=False)
+# 1) Snapshot the listing tab so the click tool can resolve element IDs.
+take_snapshot(page=pageId)
 
-# Confirm final URL after redirect settles
+# 2) Identify the first product link via the same DOM query as Step 1.2, but this
+#    time keep a stable selector for it so we can click it via the snapshot/click
+#    flow. The cleanest path is to assign a temporary marker class via
+#    evaluate_script, then ask take_snapshot to surface the marked element. If the
+#    BrowserOS snapshot is too large to scan, use search_dom with a CSS selector
+#    instead — the goal is to obtain the snapshot's element ID for the link.
+evaluate_script(page=pageId, expression="""
+(function() {
+  const links = Array.from(document.querySelectorAll('a'));
+  const productLink = links.find(l => l.href.includes('/redirect?') && l.href.includes('partnerId'));
+  if (!productLink) return 'no_link';
+  productLink.classList.add('__st_test_first_product__');
+  productLink.scrollIntoView({block: 'center'});
+  return 'marked';
+})()
+""")
+
+# 3) Resolve the marked element to a snapshot element ID and click it via the
+#    BrowserOS click tool. Real user click → triggers the portal's click-handler
+#    (which fires the redirect with the listing-page Referer and the tracking
+#    event the redirect endpoint expects), so the redirect resolves correctly
+#    instead of stripping partnerId/partnerName.
+search_dom(page=pageId, query="a.__st_test_first_product__")  # returns the element with its snapshot ID
+click(page=pageId, element=<that_snapshot_id>)
+
+# 4) Most product links open in a new tab (target="_blank"). Wait briefly, then
+#    look up the new tab via list_pages — the partner-site tab is the one whose
+#    URL is NOT the moebel.de listing.
+wait_for_new_tab(timeout_ms=8000)
+pages_after = list_pages()
+new_page_entry = next(p for p in pages_after["pages"] if "moebel.de/shops/" not in p["url"] and "meubles.fr/boutiques/" not in p["url"])
+newPageId = new_page_entry["pageId"]
+
+# 5) Some partners or markets don't use target="_blank" — the click navigates
+#    the SAME tab. Detect that by re-reading the listing tab's URL: if it
+#    changed away from the partner shop page, the click navigated in place,
+#    so newPageId is just pageId. (Both branches converge to the same next
+#    step.)
+if newPageId is None:
+    if listing_tab_url_changed_away_from_partner_shop:
+        newPageId = pageId
+
+# 6) Confirm final URL after the redirect chain settles.
 evaluate_script(page=newPageId, expression="window.location.href")
 ```
+
+**On 404 on the portal-internal `/api/product/redirectWithCheck` endpoint:** verify (a) Phase 0 accepted the portal CMP on the same session, and (b) the partner page was opened via CLICK rather than `new_page(url=redirect_href)`. The vast majority of these 404s on healthy partners are caused by direct-URL navigation. Only after both are confirmed should the 404 be reported as a partner-side / portal-side bug — and even then, retry once with a different product id in case the first product is stale.
 
 **Step 1.4: Verify moeclid in the final URL**
 ```python

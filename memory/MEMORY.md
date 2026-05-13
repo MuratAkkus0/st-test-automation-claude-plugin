@@ -9,6 +9,7 @@ Each entry links to a detail file. Keep entries to one line each.
 - [Subagent non-interactive invocation](lessons-learned/subagent-non-interactive-invocation.md) — `claude -p` needs `--plugin-dir` AND `--allowed-tools` or it fails silently or hangs
 - [Binary grep when docs fail](lessons-learned/binary-grep-when-docs-fail.md) — when Claude Code docs are ambiguous, grep the installed binary for ground truth
 - [BrowserOS profile dies on zero tabs](lessons-learned/browseros-profile-dies-on-zero-tabs.md) — Phase 0 cleanup must keep an anchor `about:blank` open or BrowserOS tears its profile down unrecoverably
+- [Phase 1 always click never direct navigate](lessons-learned/phase1-always-click-never-direct-navigate.md) — Phase 1 must CLICK the product link; `new_page(url=redirect_href)` strips partnerId mid-chain and 404s on the portal-internal redirectWithCheck endpoint
 
 ## Market Quirks
 <!-- per-market entries appear here -->
