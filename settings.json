@@ -6,7 +6,8 @@
       "Read(./**)",
       "Write(./st-test-reports/**)",
       "Write(./memory/**)",
-      "Edit(./memory/**)"
+      "Edit(./memory/**)",
+      "Bash(python3 *)"
     ]
   }
 }
