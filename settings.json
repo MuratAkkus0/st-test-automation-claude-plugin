@@ -7,6 +7,7 @@
       "Write(./st-test-reports/**)",
       "Write(./memory/**)",
       "Edit(./memory/**)",
+      "Bash(mkdir -p ./st-test-reports/**)",
       "Bash(python3 *)"
     ]
   }
