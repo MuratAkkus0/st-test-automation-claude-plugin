@@ -1,0 +1,18 @@
+Subject: Sales Tracking Integration Test — Emob (NL) — partial (Base Tag verified, Conversion Tag pending product go-live)
+
+Hi team,
+
+We have run a test of our Sales Tracking integration on your shop on 15 May 2026.
+
+The Base Tag part of the integration works correctly. After a user lands on your shop with a moeclid in the URL and accepts the CookieScript cookie consent, the click ID is read from the URL and stored in localStorage under the key MOEBEL_CLICKOUT_ID. Your GTM container is firing the Base Tag on page view as expected — no action is required from your side on the Base Tag.
+
+We did not complete the Conversion Tag verification on this run because Emob's products are not yet syndicated to the meubelo.nl portal, so a real moebel.de → product → checkout user journey is not yet possible. We will schedule a follow-up test as soon as your products go live, place a real test order on your shop, and verify that the Conversion Tag fires on the order confirmation page with the correct PARTNER_KEY, market code, order total, shipping value, and item list.
+
+For reference, here is the relevant integration documentation:
+- [Client-Side Tracking with Google Tag Manager](https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html)
+
+No test order was placed on your shop during this run, so there is nothing to cancel on your side.
+
+Best regards,
+Murat
+moebel.de Partner Integrations Team

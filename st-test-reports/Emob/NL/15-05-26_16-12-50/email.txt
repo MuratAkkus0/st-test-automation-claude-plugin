@@ -1,0 +1,20 @@
+Subject: Sales Tracking Integration Test — Emob (NL) — failed
+
+Hi team,
+
+We have run an end-to-end test of our Sales Tracking integration on your Dutch shop (emob.nl) on 15 May 2026.
+
+The Base Tag part of the integration works correctly — the moeclid click ID is captured from the landing URL and stored in localStorage after consent acceptance. However, the Conversion Tag on the order confirmation page is loading the wrong market script: it injects `https://www.moebel.de/partner/push.js` (the German script) instead of `https://www.meubelo.nl/partner/push.js` (the Dutch script). As a result, every conversion placed on your Dutch storefront is sent to our German sales endpoint (`redirect.moebel.de/.../de/sales`) and is registered against the German Emob integration. None of these conversions reach the Dutch market account.
+
+To fix it, please update the Conversion Tag on emob.nl so it loads `https://www.meubelo.nl/partner/push.js`. If a dedicated PARTNER_KEY has been issued for the Dutch market, please also replace the current `data-partner-key` value (`609d0e02-16de-4f17-abcb-190dad1d8701`) with the Dutch key at the same time. Publishing the updated GTM container is enough — no other change is needed on your side.
+
+For reference, here is the relevant integration documentation:
+- Client-Side Tracking with Google Tag Manager: https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html
+
+As part of the test we placed test order 5000084845 (Lattenbodem Supra fix 26 latten - 90x200cm, €199.90) on your shop. Please cancel and refund this order at your convenience.
+
+Please let us know once you have made the required changes so we can re-test the integration.
+
+Best regards,
+Murat
+moebel.de Partner Integrations Team
