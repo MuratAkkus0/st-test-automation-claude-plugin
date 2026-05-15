@@ -10,6 +10,17 @@ These conventions apply when modifying the plugin itself (adding skills, agents,
 - **`--plugin-dir` is the install path for local dev.** Never assume marketplace install for personal use — see [plugin-dev-workflow](../memory/lessons-learned/plugin-dev-workflow.md).
 - **`$CLAUDE_PLUGIN_ROOT`, not `$CLAUDE_PROJECT_DIR`,** is the env var that points to the plugin's install directory inside hooks and scripts. `$CLAUDE_PROJECT_DIR` is where Claude was launched, which may be the parent of the plugin.
 
+## Scope discipline
+
+When invoked under `/st-plugin-development` (or any other plugin-scoped skill), the only writable surface is **inside `/Users/murat.akkus/Desktop/claude-plugins/`**. This is a hard rule, not a guideline.
+
+- **`~/.claude/settings.json`, `~/.claude/agents/`, `~/.config/`, `/etc/`, sibling repos, and any other path outside the plugin tree are read-only.** Even when a global edit would technically help future plugin runs (e.g. adding permissions to reduce future prompts), making it under a plugin-development invocation is a scope violation.
+- **If the user asks for something that *seems* to require a global edit, surface the conflict instead of acting on it.** Two valid responses: (1) propose an in-scope equivalent (e.g. a project-level `.claude/settings.local.json` at the workspace root, still inside the same checkout); or (2) ask the user explicitly whether they want a one-off global edit even though it's outside plugin scope. Wait for direction.
+- **`Read` outside scope is fine for context.** `Edit`/`Write` outside scope is not.
+- **The fence is the contract.** Each scoped skill creates one: `/sales-tracking-test-automation` writes only into `st-test-reports/{Partner}/{MARKET}/<timestamp>/`; `/st-memory` writes only into `memory/`; `/st-plugin-development` writes only into the plugin tree. Crossing the fence is what makes the user feel the agent went off-task.
+
+See [plugin-scope-no-global-edits](../memory/lessons-learned/plugin-scope-no-global-edits.md) for the 2026-05-15 incident this rule was extracted from.
+
 ## Hook pattern
 
 Every new hook follows the same three-piece pattern:
