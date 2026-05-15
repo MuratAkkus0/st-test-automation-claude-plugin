@@ -1,0 +1,21 @@
+Subject: Sales Tracking Integration Test — MeinMassivholz (DE) — failed
+
+Hi team,
+
+We have run an end-to-end test of our Sales Tracking integration on your shop on 15 May 2026.
+
+The Base Tag part works correctly — the moeclid click ID is captured from the landing URL and stored in localStorage after consent acceptance. However, the Conversion Tag on the order confirmation page (`/checkout/finish`) is firing with `total`, `shipping`, `items` and `orderId` all undefined. Our SDK's input sanitizer rejects the call (`Can not convert undefined to number (float)`) and no request reaches our sales endpoint, so the conversion is never recorded on our side.
+
+To fix this, please populate your data layer on the order confirmation page so that the GTM variables your Conversion Tag reads (currently mapped to total, shipping, items, and order id) resolve to the actual order values. The order id variable additionally needs to be wired without `String(...)` — at the moment it is being sent as the literal string `"undefined"`. Once the data layer push is in place on the confirmation page, the Conversion Tag will fire correctly without any further code changes.
+
+For reference, here is the relevant integration documentation:
+
+- [Client-Side Tracking with Google Tag Manager](https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html)
+
+As part of the test we placed test order 31708 on your shop (payment method Vorkasse, total 270,00 €). Please cancel and refund this order at your convenience.
+
+Please let us know once you have made the required changes so we can re-test the integration.
+
+Best regards,
+Murat
+moebel.de Partner Integrations Team
