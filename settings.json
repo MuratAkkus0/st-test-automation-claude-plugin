@@ -20,7 +20,10 @@
 
       "Bash(mkdir -p st-test-reports/**)",
       "Bash(date *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(until *)",
+      "Bash(ls *)",
+      "Bash(jq *)"
     ]
   }
 }
