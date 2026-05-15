@@ -9,6 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Added
 
 - `skills/st-plugin-development/SKILL.md` — canonical development workflow skill that codifies the methodology established across the plugin's first 7+ iterations. Auto-invoked for any plugin edit/patch/feature work. Enforces nine phases (pre-check → plan → subagent decision → anti-orphan/anti-duplicate/anti-workaround → implementation → validation → docs update → commit → post-verification). Hard guarantees: no workarounds, no orphan files, no duplicate features, no inline bash in `hooks.json`, no AI attribution in commits, root-cause fixes only.
+- `memory/lessons-learned/plugin-scope-no-global-edits.md` — codifies that `/st-plugin-development` may only edit files inside the plugin tree; never `~/.claude/`, `/etc/`, or sibling repos. Cross-linked from `docs/dev-conventions.md` as a new "Scope discipline" section.
+- New English fix-paragraph variant in the partner-email template (`skills/st-report-generation/SKILL.md`) for the "Conversion Tag called with undefined values" failure mode — instructs the partner to check both GTM variable names and data-layer population at checkout.
+
+### Changed
+
+- Phase 6 problem-summary variant for the Conversion-Tag failure mode (`skills/st-report-generation/SKILL.md`): replaced the narrow "Conversion payload sends null for shipping/items (server-side)" wording with the broader, hand-authored canonical version that covers wrong GTM variable names AND unpopulated checkout data, written as two paragraphs (problem description + fix instruction). The variant now lists explicit trigger criteria (`MOEBEL_SALES.sale()` call present + console errors `Can not convert undefined to number` / `Error sanitizing sale`) so the right variant is selected automatically. English email outcome-paragraph variant updated to mirror.
+- `st-test-plugin/settings.json` (plugin-root forward-compat manifest) — added `Bash(until *)`, `Bash(ls *)`, `Bash(jq *)` so the declared permission set matches what ST-test runs actually exercise. The file is still ignored by Claude Code today (only `agent` and `subagentStatusLine` keys are honored at plugin root), but stays the canonical source of truth for the team-facing setup guide.
+- `docs/setup-guide.md` — full team-facing permission list now mirrors plugin-root `settings.json` (MCP wildcards + bash utilities), not just the two MCP wildcards. Clarified that `Read`/`Write`/`Edit` paths inside the plugin tree don't need to be added to user-side `~/.claude/settings.json`.
 
 ## [1.7.0] — 2026-05-13
 
