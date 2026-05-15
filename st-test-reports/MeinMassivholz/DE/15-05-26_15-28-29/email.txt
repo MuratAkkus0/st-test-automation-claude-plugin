@@ -1,0 +1,21 @@
+Subject: Sales Tracking Integration Test — meinmassivholz (DE) — partial (Base Tag verified, Conversion Tag still pending)
+
+Hi team,
+
+We have run a test of our Sales Tracking integration on your shop on 15 May 2026.
+
+The Base Tag part of the integration works correctly. After a user lands on your shop from moebel.de and accepts the Consentmanager cookie consent, the moeclid click ID is read from the URL and stored in localStorage under the key MOEBEL_CLICKOUT_ID. No action is required from your side on the Base Tag.
+
+We did not complete the Conversion Tag verification on this run because we stopped on the order confirmation page without placing the test order. To verify that part of the integration we will need to run a second test where a real test order is submitted, so we can confirm the conversion call carries the correct PARTNER_KEY, market code, order total, shipping value, and item list. We will schedule that follow-up shortly and let you know once it is done.
+
+One small unrelated finding: your custom theme file `dne-custom-css-js.js` throws a JavaScript syntax error in the browser console (line 223, "Unexpected end of input"). This does not affect the Sales Tracking integration, but you may want to have your theme developer take a look.
+
+For reference, here are the relevant integration documentations:
+- [Client-Side Tracking with Google Tag Manager](https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html)
+- [Manual Client-Side Integration](https://partner-integration.moebel.de/sales-tracking/1/manual-client-side-integration.html)
+
+No test order was placed on your shop during this run, so there is nothing to cancel on your side.
+
+Best regards,
+Murat
+moebel.de Partner Integrations Team
