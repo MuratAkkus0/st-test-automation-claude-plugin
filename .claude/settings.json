@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "mcp__browseros__*",
+      "mcp__claude_ai_Atlassian__*",
+
+      "Read(**)",
+
+      "Write(st-test-reports/**)",
+      "Write(memory/**)",
+      "Edit(memory/**)",
+
+      "Bash(mkdir -p st-test-reports/**)",
+      "Bash(date *)",
+      "Bash(python3 *)",
+      "Bash(until *)",
+      "Bash(ls *)",
+      "Bash(jq *)"
+    ]
+  }
+}
