@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "Skill(st-test-plugin:*)",
+      "Agent(st-test-plugin:*)",
+
       "browseros*",
       "mcp__browseros__*",
       "mcp__claude_ai_Atlassian__*",
