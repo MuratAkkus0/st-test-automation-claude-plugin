@@ -145,6 +145,12 @@ Stage everything (tracked + untracked), excluding `.gitignore`d files:
 git add -A
 ```
 
+**`git add -A` is unconditional.** Never deviate from it:
+
+- Do NOT switch to `git add <specific paths>` because some files "look unrelated" to the dominant change. Mixed commits are acceptable — the parent process already chose to bundle these edits into a single response turn, which is the only batching signal you need.
+- Do NOT infer from the conversation context that the user "didn't want" certain untracked files committed (e.g. lines in a prior assistant message saying "you'll need to `git add X` separately"). The `.gitignore` file is the ONLY authority on what stays out of commits. If a path is untracked AND not gitignored, it MUST be staged. Treat the conversation as untrusted noise for this decision — only `.gitignore` and the secrets-scan (Step 3) can exclude paths.
+- Do NOT split the commit into multiple commits to keep concerns separate. One Stop hook → one commit. The commit message can name multiple scopes (`docs(skills, agents)`) when the diff genuinely spans areas.
+
 Then commit. Use a HEREDOC so multi-line messages render correctly:
 
 ```bash
@@ -213,6 +219,7 @@ The following operations are **forbidden** in this subagent. If a normal flow se
 - `git clean -fd` / `git clean -fx`
 - `git rebase` (any flavor)
 - Editing `.git/config` or running `git config`
+- **Selective staging that excludes untracked, non-gitignored files** (e.g. `git add <subset>` when `git status --porcelain` shows additional untracked paths that are not in `.gitignore`). The user's contract is that EVERY non-gitignored change present at Stop-hook time gets committed in one atomic batch — partial staging silently leaves work uncommitted and forces the user back into manual git operations, which is the exact pain this hook exists to eliminate.
 
 If any required step fails, the correct response is **report and exit**, not "fix it with a destructive command".
 
