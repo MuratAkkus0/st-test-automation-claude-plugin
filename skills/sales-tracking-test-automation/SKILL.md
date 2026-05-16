@@ -82,7 +82,7 @@ st-test-reports/
 - Example: `st-test-reports/IKEA/DE/14-04-25_14-35-22/report.md`
 - Contains: full phase-by-phase results, screenshots references, root cause analysis, recommendations
 
-**2. Jira Report** (concise summary — in the style of the project's real Jira comments)
+**2. Jira Report** (concise German summary intended for direct paste into a Jira ticket comment)
 - Path format: `st-test-reports/{Partner}/{MARKET}/{DD-MM-YY_HH-MM-SS}/jira.md`
 - Example: `st-test-reports/IKEA/DE/14-04-25_14-35-22/jira.md`
 - Contains: short German message — greeting, one-sentence test outcome, 1–2 sentence problem summary, documentation reference, order information block

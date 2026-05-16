@@ -115,7 +115,7 @@ ACCEPT_KEYWORDS = {
 - Fallback postal code: 20359
 - Fallback city: Hamburg
 
-> ⚠️ Note: **"Moebel.de Str."** is the literal street name used by the QA test identity (per the project's IDENTITY INFORMATIONEN document). Do not substitute "Mönckebergstraße" or any other real Hamburg street name — keep it exactly as "Moebel.de Str." with a period after "Str". If a partner's address validation rejects a dotted abbreviation, first try "Moebel.de Straße" (fully spelled) before falling back to the Reeperbahn fallback.
+> ⚠️ Note: **"Moebel.de Str."** is the literal street name used by the QA test identity (per the project's [IDENTITY INFORMATIONEN](../../hepler-documantations/IDENTITY%20INFORMATIONEN.md) document). Do not substitute "Mönckebergstraße" or any other real Hamburg street name — keep it exactly as "Moebel.de Str." with a period after "Str". If a partner's address validation rejects a dotted abbreviation, first try "Moebel.de Straße" (fully spelled) before falling back to the Reeperbahn fallback.
 
 **French Market (fr):**
 - Name: TEST MEUBLESFR
@@ -154,23 +154,25 @@ ACCEPT_KEYWORDS = {
 
 ## Integration Documentation References
 
-Reference these when writing troubleshooting recommendations:
+Reference these when writing troubleshooting recommendations. Each integration has a local reference doc bundled with the plugin under `hepler-documantations/` (read locally when you need the implementation details) AND a public URL (used in partner-facing reports and Jira drafts).
 
-1. **GTM_Client_Side_Integration_Documentation** — For GTM client-side issues
-2. **GTM_Server-Side_Integration_Documentation** — For GTM server-side issues
-3. **Shopify_Integration_Documentation** — For Shopify custom pixels
-4. **Manual_Client_Side_Integration_Documentation** — For manual client-side implementation
-5. **Manual_Server-Side_Integration_Documentation** — For manual server-side implementation
+1. **GTM Client-Side Integration** — For GTM client-side issues. Local: [`GTM Client Side Integration Documantation.md`](../../hepler-documantations/GTM%20Client%20Side%20Integration%20Documantation.md)
+2. **GTM Server-Side Integration** — For GTM server-side issues. Local: [`GTM Server-Side Integration Documantation.md`](../../hepler-documantations/GTM%20Server-Side%20Integration%20Documantation.md)
+3. **Shopify Custom Pixel Integration** — For Shopify custom pixels. Local: [`Shopify Integration Documantation.md`](../../hepler-documantations/Shopify%20Integration%20Documantation.md)
+4. **Manual Client-Side Integration** — For manual client-side implementation. Local: [`Manual Client Side Integration Documantation.md`](../../hepler-documantations/Manual%20Client%20Side%20Integration%20Documantation.md)
+5. **Manual Server-Side Integration** — For manual server-side implementation. Local: [`Manual Server-Side Integration Documantation.md`](../../hepler-documantations/Manual%20Server-Side%20Integration%20Documantation.md)
 
 **URL reference table** (canonical source of truth — never edit URLs without updating this table):
 
-| Integration type | Documentation URL |
-| --- | --- |
-| GTM Client-Side | https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html |
-| GTM Server-Side | https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-server-side.html |
-| Manual Client-Side | https://partner-integration.moebel.de/sales-tracking/1/manual-client-side-integration.html |
-| Manual Server-Side | https://partner-integration.moebel.de/sales-tracking/1/manual-server-side-integration.html |
-| Shopify Custom Pixel | *(not publicly available yet — to be linked once published)* |
+| Integration type | Public documentation URL | Local reference file |
+| --- | --- | --- |
+| GTM Client-Side | https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-client-side.html | [GTM Client Side Integration Documantation.md](../../hepler-documantations/GTM%20Client%20Side%20Integration%20Documantation.md) |
+| GTM Server-Side | https://partner-integration.moebel.de/sales-tracking/1/google-tag-manager-server-side.html | [GTM Server-Side Integration Documantation.md](../../hepler-documantations/GTM%20Server-Side%20Integration%20Documantation.md) |
+| Manual Client-Side | https://partner-integration.moebel.de/sales-tracking/1/manual-client-side-integration.html | [Manual Client Side Integration Documantation.md](../../hepler-documantations/Manual%20Client%20Side%20Integration%20Documantation.md) |
+| Manual Server-Side | https://partner-integration.moebel.de/sales-tracking/1/manual-server-side-integration.html | [Manual Server-Side Integration Documantation.md](../../hepler-documantations/Manual%20Server-Side%20Integration%20Documantation.md) |
+| Shopify Custom Pixel | *(not publicly available yet — to be linked once published)* | [Shopify Integration Documantation.md](../../hepler-documantations/Shopify%20Integration%20Documantation.md) |
+
+**Rule:** When generating partner-facing reports / Jira drafts / emails, always use the **Public documentation URL** — never link the local helper file. The local file is for the agent's own reading when it needs to look up implementation details (e.g., expected payload structure, tag setup steps).
 
 ## Market Code → Uppercase Mapping (Jira/email reports)
 

@@ -362,7 +362,7 @@ else:
 >
 > **Required fix:**
 >
-> - **GTM integration:** Verify the Base Tag exists in the GTM container and is published. If the tag exists, check that it has a **Page View — All Pages** trigger attached. If the tag is missing, implement it from scratch following the GTM_Client_Side_Integration_Documentation or GTM_Server-Side_Integration_Documentation.
+> - **GTM integration:** Verify the Base Tag exists in the GTM container and is published. If the tag exists, check that it has a **Page View — All Pages** trigger attached. If the tag is missing, implement it from scratch following the [GTM Client Side Integration Documantation](../../hepler-documantations/GTM%20Client%20Side%20Integration%20Documantation.md) or [GTM Server-Side Integration Documantation](../../hepler-documantations/GTM%20Server-Side%20Integration%20Documantation.md). The matching public URLs for partner-facing reports live in `st-market-reference`.
 >
 > - **Manual integration:** Verify the tracking script is included in the page source. Open browser DevTools → Sources and confirm the script loads. Check the Console for JavaScript errors. Verify the script reads `window.location.search` or `URLSearchParams` for the `moeclid` parameter.
 

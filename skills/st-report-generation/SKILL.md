@@ -75,7 +75,7 @@ Present the file link via `computer://` so the user can open it directly.
 
 ## Step 6.4: Generate the Jira report (second report, always produced)
 
-After the comprehensive report is written, also write a concise Jira-style message to a second file. This is not optional — it is produced for every test, regardless of result. It mirrors the style of the real Jira comments in the project's `Sales_Tracking_Report_for_Jira_Example_*` files and is meant to be copy-pasted directly into a Jira ticket comment by the tester.
+After the comprehensive report is written, also write a concise Jira-style message to a second file. This is not optional — it is produced for every test, regardless of result. The format mirrors the conventions documented in this skill and is meant to be copy-pasted directly into a Jira ticket comment by the tester.
 
 **Language:** German. All real-world examples in this project are in German, colleagues are tagged in German tickets, and the integration documentation titles are quoted in German. Generate the Jira report in German regardless of which market was tested (a Polish partner still gets a German Jira report, because the internal audience is German).
 
@@ -181,14 +181,14 @@ _Created by Sales Tracking Test Automation_
 - **`{ORDER_ID}`** — the order number from Phase 3, sourced via Phase 3 Step 3.6. Use `report["phase3"]["order_id"]`. The way the value is presented depends on `report["phase3"]["order_id_source"]`:
   - `page_text` (the normal, trusted case) — render the value plainly with no annotation: `Bestellnr.: 166094`.
   - `url_id_order_fallback` — render the value with the mandatory disclaimer so the partner is not handed an internal id that is invisible to their customer-facing system. German: `Bestellnr.: 166094 (aus URL-Parameter id_order, nicht auf der Bestätigungsseite sichtbar)`. English: `Order no.: 166094 (from URL parameter id_order — not shown on the confirmation page)`.
-  - `none` (or no order submitted at all) — write `Keine Bestellung freigegeben` and omit the Datum and Zahlungsmethode lines as well, replacing the whole order-info block with a single line `Keine Bestellung freigegeben` (see Example 3 in the project files).
+  - `none` (or no order submitted at all) — write `Keine Bestellung freigegeben` and omit the Datum and Zahlungsmethode lines as well, replacing the whole order-info block with a single line `Keine Bestellung freigegeben`.
 
 - **`{DATE_TIME}`** — test timestamp formatted as `YYYY-MM-DD HH:MM:SS`.
 
 - **`{PAYMENT_METHOD_DE}`** — German name of the payment method selected in Phase 3:
   - Vorkasse → `Vorkasse`
   - Bank transfer / Überweisung → `Banküberweisung`
-  - Credit card → `Kreditkarte` (and append ` (von Steffen)` if the company credit card was used, per Example 2 and Example 6)
+  - Credit card → `Kreditkarte` (and append ` (von Steffen)` if the company credit card was used)
   - If Phase 3 was not reached → omit the line entirely (see "Order ID" rule above)
 
 **Length discipline:**
