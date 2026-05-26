@@ -7,7 +7,7 @@
 | **Partner domain** | `www.wohn-schick.de` |
 | **Date** | 2026-05-26 22:53:12 |
 | **Jira ticket** | ACM-3091 |
-| **Overall result** | ⚠️ **NOT COMPLETED** — Base Part works, but the checkout could not be completed (partner checkout returns HTTP 500), so no order was placed and the Conversion Part could not be verified |
+| **Overall result** | ⚠️ **NOT COMPLETED** — the checkout could not be completed (partner checkout returns HTTP 500), so no order was placed and the test could not be finished |
 | **Shop platform** | Shopware 6 |
 | **Partner CMP** | Usercentrics |
 
@@ -19,7 +19,7 @@
 |---|---|
 | Phase 0 — Pre-test setup & portal consent | ✅ PASS |
 | Phase 1 — Navigation & moeclid capture | ✅ PASS |
-| Phase 2 — Base Part verification | ✅ WORKING (moeclid stored in cookie) |
+| Phase 2 — moeclid storage check | ⚠️ INCONCLUSIVE — click ID found, but stored in a non-standard location (`MOEBEL_CLICKOUT_ID` cookie); does not match our server-side or client-side pattern |
 | Phase 3 — Purchase flow | 🛑 BLOCKED — `/checkout/confirm` returns HTTP 500; no order could be placed |
 | Phase 4 — Conversion Part | ⏭️ Not reached (no order to verify) |
 
@@ -37,15 +37,15 @@
 - Final URL: `https://www.wohn-schick.de/lea-sitzkissen-40x40/1206229-7?...&moeclid=108adadc-00a2-4e76-b73b-4a69bea20f00`
 - **moeclid present:** ✅ `108adadc-00a2-4e76-b73b-4a69bea20f00`
 
-## Phase 2 — Base Part verification
+## Phase 2 — moeclid storage check
 
 - Pre-clean: partner-domain storage cleared, page reloaded with `moeclid` in URL.
 - Initial page state: product page with a **Usercentrics** consent banner. No blocking newsletter modal.
 - Cookie consent: **Usercentrics** — "Alles akzeptieren" accepted.
 - Storage check (no reload after consent):
-  - **`MOEBEL_CLICKOUT_ID` cookie found:** ✅ clickId `108adadc-00a2-4e76-b73b-4a69bea20f00` — **matches the URL parameter exactly**
-  - `moeclid` cookie: not present; `MOEBEL_CLICKOUT_ID` localStorage: not present
-- **Base Part verdict: WORKING.** The moeclid is stored in a `MOEBEL_CLICKOUT_ID` cookie carrying the JSON structure `{"date":..., "clickId":...}`. The cookie is readable via `document.cookie` (JS-set) and persisted across login.
+  - A `MOEBEL_CLICKOUT_ID` **cookie** was found, carrying the JSON `{"date":..., "clickId":"108adadc-00a2-4e76-b73b-4a69bea20f00"}` (clickId matches the URL).
+  - No cookie named `moeclid`; no `MOEBEL_CLICKOUT_ID` entry in localStorage.
+- **Verdict: INCONCLUSIVE — storage location does not match either supported integration pattern.** Our server-side integration stores the click ID in a cookie named **`moeclid`**; our client-side integration stores **`MOEBEL_CLICKOUT_ID`** in **localStorage**. Here the value is in a **`MOEBEL_CLICKOUT_ID` cookie**, which is neither. So even though a click ID is present, it cannot be treated as a correctly-implemented base setup — the conversion side may not read it as expected. This needs review against the integration the partner actually set up. (It could not be validated end-to-end anyway, because the checkout blocked the conversion test — see Phase 3.)
 
 ## Phase 3 — Purchase flow 🛑 BLOCKED
 
@@ -67,13 +67,16 @@ Not reached — there is no order confirmation page to read. The Conversion Part
 
 ## Root cause analysis
 
-The moebel.de tracking integration's **Base Part is working correctly** — the moeclid is captured from the landing URL and stored (in a `MOEBEL_CLICKOUT_ID` cookie) after consent, and it survives login. The blocker is **not** a tracking issue: the partner's own **checkout confirmation page (`/checkout/confirm`) returns an HTTP 500 server error**, so the order cannot be finalised. This affects the partner's normal checkout (real customers would hit the same error), independent of moebel.de tracking. Until the partner fixes the checkout, the Conversion Part cannot be tested because no order can be placed.
+Two separate findings:
+
+1. **Checkout blocked (primary blocker):** the partner's own **checkout confirmation page (`/checkout/confirm`) returns an HTTP 500 server error**, so no order can be finalised. This affects the partner's normal checkout (real customers would hit the same error), independent of moebel.de tracking. Until it is fixed, the Conversion Part cannot be tested because no order can be placed.
+2. **Non-standard click-ID storage (needs review):** the click ID is stored in a `MOEBEL_CLICKOUT_ID` **cookie**, which matches neither our server-side pattern (cookie named `moeclid`) nor our client-side pattern (`MOEBEL_CLICKOUT_ID` in localStorage). So the storage cannot be treated as a correctly-implemented setup; it should be checked against the integration type the partner actually uses.
 
 ## Recommendations
 
 - Partner must investigate the **HTTP 500 on `/checkout/confirm`** in their Shopware logs (likely a payment/shipping method or checkout plugin exception — note: Adyen appears to be in TEST mode `checkoutshopper-test.adyen.com`, and a `saleschecker.io` script fails with a certificate error on the confirm page; either could be implicated).
-- Re-run the Conversion Part test once the checkout completes successfully.
-- Base Part requires no action — it is storing the moeclid correctly.
+- Review the click-ID storage: it is currently in a `MOEBEL_CLICKOUT_ID` **cookie**, which is neither the server-side (`moeclid` cookie) nor the client-side (`MOEBEL_CLICKOUT_ID` localStorage) location. Confirm which integration the partner implemented and that the click ID is stored where the conversion side expects to read it.
+- Re-run the test once the checkout completes successfully, to validate the conversion end-to-end.
 
 ## Test Data References
 

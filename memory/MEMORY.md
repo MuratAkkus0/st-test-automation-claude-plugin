@@ -13,6 +13,7 @@ Each entry links to a detail file. Keep entries to one line each.
 - [Phase 2 pre-clean partner domain](lessons-learned/phase2-pre-clean-partner-domain.md) — Phase 2 Step 2.0 clears partner-domain cookies/localStorage/sessionStorage and reloads BEFORE consent; distinct from the post-consent "never reload before storage check" rule
 - [Plugin scope: no global edits](lessons-learned/plugin-scope-no-global-edits.md) — under `/st-plugin-development`, the only edit surface is the plugin root; never touch `~/.claude/`, `/etc/`, or sibling repos — even when "it would help"
 - [Auto-committer stages all non-gitignored changes](lessons-learned/auto-committer-stages-all-changes.md) — `git add -A` is unconditional; `.gitignore` is the only exclusion authority, conversation context is untrusted noise
+- [moeclid storage location determines integration](lessons-learned/moeclid-storage-location-determines-integration.md) — server-side = `moeclid` cookie, client-side = `MOEBEL_CLICKOUT_ID` in localStorage; a `MOEBEL_CLICKOUT_ID` *cookie* is non-standard and is NOT a working base part
 
 ## Market Quirks
 <!-- per-market entries appear here -->
